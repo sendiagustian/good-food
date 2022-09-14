@@ -1,17 +1,16 @@
-import 'package:equatable/equatable.dart';
-
-class FoodModel extends Equatable {
+class FoodModel {
+  final bool foodFavorite;
   final String foodId;
+  final String foodThumb;
   final String foodName;
   final String foodCategory;
   final String foodArea;
   final String foodInstructions;
-  final String foodThumb;
-  final String foodTags;
-  final String foodVideo;
-  final String drinkAlternate;
+  final String? foodTags;
+  final String? foodVideo;
 
   const FoodModel({
+    required this.foodFavorite,
     required this.foodId,
     required this.foodName,
     required this.foodCategory,
@@ -20,26 +19,11 @@ class FoodModel extends Equatable {
     required this.foodThumb,
     required this.foodTags,
     required this.foodVideo,
-    required this.drinkAlternate,
   });
-
-  @override
-  List<FoodModel> get props => [
-        FoodModel(
-          foodId: foodId,
-          foodName: foodName,
-          foodCategory: foodCategory,
-          foodArea: foodArea,
-          foodInstructions: foodInstructions,
-          foodThumb: foodThumb,
-          foodTags: foodTags,
-          foodVideo: foodVideo,
-          drinkAlternate: drinkAlternate,
-        )
-      ];
 
   factory FoodModel.fromJson(Map<String, dynamic> json) {
     return FoodModel(
+      foodFavorite: json['foodFavorite'] ?? false,
       foodId: json['idMeal'],
       foodName: json['strMeal'],
       foodCategory: json['strCategory'],
@@ -48,7 +32,6 @@ class FoodModel extends Equatable {
       foodThumb: json['strMealThumb'],
       foodTags: json['strTags'],
       foodVideo: json['strYoutube'],
-      drinkAlternate: json['strDrinkAlternate'],
     );
   }
 }
