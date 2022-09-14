@@ -3,85 +3,28 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:goodfood/data/db/app_database.dart';
-import 'package:goodfood/features/favorite/screens/favorite_screen.dart';
-import 'package:goodfood/features/food/bloc/food/food_bloc.dart';
+import 'package:goodfood/features/favorite/bloc/favorite/favorite_bloc.dart';
 import 'package:goodfood/features/food/screen/food_detail/food_detail_screen.dart';
 
-import '../../../favorite/bloc/favorite/favorite_bloc.dart';
-import '../../bloc/detail_food/detail_food_bloc.dart';
+import '../../food/bloc/detail_food/detail_food_bloc.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class FavoriteScreen extends StatelessWidget {
+  const FavoriteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    FoodBloc foodBloc = context.read<FoodBloc>();
+    FavoriteBloc foodBloc = context.read<FavoriteBloc>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.only(left: 16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 23,
-                    height: 3.5,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    width: 12,
-                    height: 3.5,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        title: const Text('GoodFood'),
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.white),
-            onPressed: () async {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return BlocProvider(
-                      create: (context) {
-                        return FavoriteBloc(context)..add(LoadFavoriteEvent());
-                      },
-                      child: const FavoriteScreen(),
-                    );
-                  },
-                ),
-              );
-            },
-            child: const Icon(
-              Icons.favorite,
-              color: Colors.white,
-            ),
-          )
-        ],
+        title: const Text('My Favorite Food'),
       ),
-      body: BlocBuilder<FoodBloc, FoodState>(
+      body: BlocBuilder<FavoriteBloc, FavoriteState>(
         builder: (context, state) {
-          if (state is FoodLoadedState) {
+          if (state is FavoriteLoaded) {
             return RefreshIndicator(
               onRefresh: () {
-                foodBloc.add(RefreshFoodEvent());
+                foodBloc.add(RefreshFavoriteEvent());
                 return Future.value();
               },
               child: ListView.builder(
@@ -90,13 +33,13 @@ class HomeScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return _buildItemFood(
                     context: context,
-                    food: state.model[index],
-                    foodBloc: foodBloc,
+                    favorite: state.model[index],
+                    favoriteBloc: foodBloc,
                   );
                 },
               ),
             );
-          } else if (state is FoodErrorState) {
+          } else if (state is FavoriteError) {
             return Center(child: Text(state.message));
           }
           return const Center(child: CircularProgressIndicator());
@@ -107,10 +50,11 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildItemFood({
     required BuildContext context,
-    required FoodEntityData food,
-    required FoodBloc foodBloc,
+    required FoodEntityData favorite,
+    required FavoriteBloc favoriteBloc,
   }) {
-    List<String> tags = food.foodTags != null ? food.foodTags!.split(',') : [];
+    List<String> tags =
+        favorite.foodTags != null ? favorite.foodTags!.split(',') : [];
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       child: InkWell(
@@ -122,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                 return BlocProvider(
                   create: (context) => DetailFoodBloc(context)
                     ..add(
-                      InitialDataById(food),
+                      InitialDataById(favorite),
                     ),
                   child: const FoodDetailScreen(),
                 );
@@ -141,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                 child: FadeInImage.assetNetwork(
                   fit: BoxFit.cover,
                   placeholder: 'assets/images/placeholder_content.png',
-                  image: food.foodThumb,
+                  image: favorite.foodThumb,
                 ),
               ),
             ),
@@ -152,7 +96,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    '${food.foodName} - ${food.foodArea}',
+                    '${favorite.foodName} - ${favorite.foodArea}',
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -163,7 +107,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    food.foodCategory,
+                    favorite.foodCategory,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -198,26 +142,22 @@ class HomeScreen extends StatelessWidget {
             IconButton(
               onPressed: () {
                 FoodEntityCompanion entity = FoodEntityCompanion(
-                  foodFavorite: drift.Value(!food.foodFavorite),
-                  foodThumb: drift.Value(food.foodThumb),
-                  foodId: drift.Value(food.foodId),
-                  foodName: drift.Value(food.foodName),
-                  foodCategory: drift.Value(food.foodCategory),
-                  foodArea: drift.Value(food.foodArea),
-                  foodInstructions: drift.Value(food.foodInstructions),
-                  foodTags: drift.Value(food.foodTags),
-                  foodVideo: drift.Value(food.foodVideo),
+                  foodFavorite: drift.Value(!favorite.foodFavorite),
+                  foodThumb: drift.Value(favorite.foodThumb),
+                  foodId: drift.Value(favorite.foodId),
+                  foodName: drift.Value(favorite.foodName),
+                  foodCategory: drift.Value(favorite.foodCategory),
+                  foodArea: drift.Value(favorite.foodArea),
+                  foodInstructions: drift.Value(favorite.foodInstructions),
+                  foodTags: drift.Value(favorite.foodTags),
+                  foodVideo: drift.Value(favorite.foodVideo),
                 );
-                foodBloc.add(UpdateFoodEvent(entity));
+                favoriteBloc.add(UpdateFavoriteEvent(entity));
               },
-              icon: food.foodFavorite
-                  ? const Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    )
-                  : const Icon(
-                      Icons.favorite_border,
-                    ),
+              icon: const Icon(
+                Icons.favorite,
+                color: Colors.red,
+              ),
             )
           ],
         ),

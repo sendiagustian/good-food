@@ -28,6 +28,12 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
+  Future<List<FoodEntityData>> getFoodFavorites() async {
+    return await (select(foodEntity)
+          ..where((tbl) => tbl.foodFavorite.equals(true)))
+        .get();
+  }
+
   Future<List<FoodEntityData>> getFoodEntitis() async {
     return await select(foodEntity).get();
   }

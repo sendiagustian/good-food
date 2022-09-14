@@ -22,21 +22,15 @@ class AppBloc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(
-          create: (context) => FoodRepository(),
-        ),
-      ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => FoodBloc(
-              context: context,
-              repository: RepositoryProvider.of<FoodRepository>(context),
-            )..add(LoadFoodEvent()),
-          ),
-        ],
+    return RepositoryProvider(
+      create: (context) => FoodRepository(),
+      child: BlocProvider(
+        create: (context) {
+          return FoodBloc(
+            context: context,
+            repository: RepositoryProvider.of<FoodRepository>(context),
+          )..add(LoadFoodEvent());
+        },
         child: const App(),
       ),
     );

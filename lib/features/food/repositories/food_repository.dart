@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:goodfood/data/models/food_model.dart';
 
 import '../../../config/constant_config.dart';
 import '../../../core/network/network_info.dart';
@@ -35,15 +34,5 @@ class FoodRepository {
       debugPrint('Internet No connected');
       return null;
     }
-  }
-
-  Future<List<String>> getFoodCategories() {
-    // TODO: implement getFoodCategories
-    throw UnimplementedError();
-  }
-
-  Future<List<FoodModel>> filterFoodByCategories(String category) {
-    // TODO: implement filterFoodByCategories
-    throw UnimplementedError();
   }
 }
