@@ -61,7 +61,7 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
           }
           emit(FoodLoadedState(foodEntities));
         } else {
-          emit(FoodErrorState('foodsRespone null'));
+          emit(FoodErrorState('foodsRespone null - No internet access'));
         }
       } catch (e) {
         emit(FoodErrorState(e.toString()));
